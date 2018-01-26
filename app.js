@@ -39,8 +39,9 @@ router.route('/check')
 		var invocationParameters = req.body.invocationParameters;
 		var expectedResultData = req.body.expectedResultData;
 		var expectedResultStatus = req.body.expectedResultStatus;
-		res.send(check(url,invocationParameters,expectedResultData,expectedResultStatus));
-        res.end();
+		check(url,invocationParameters,expectedResultData,expectedResultStatus).then((out)=>{
+			res.json(out);
+		});
 	});
 router.route('/count').get(function (req, res) {
     res.json({count: 3})
@@ -72,14 +73,14 @@ var check = function (url,invocationParameters,expectedResultData,expectedResult
 	var risposta = [];
 	return fetch(query)
 		.then(function(res) {
-			var resultsCheck = compareResults(expectedResultData,res);
+			var resultsCheck = compareResults(expectedResultData,res.body);
 			var statusCheck = expectedResultStatus == res.status;
 			risposta['urlChecked'] = url;
 			risposta['resultData'] = res;
 			risposta['resultStatus'] = res.status;
 			risposta['statusTestPassed'] = statusCheck;
 			risposta['resultDataAsExpected'] = resultsCheck;
-			return JSON.stringify(risposta);
+			return risposta;
 		});
 	 
 }
