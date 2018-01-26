@@ -25,7 +25,7 @@ app.use(function (req, res, next) {
         res.header('Access-Control-Allow-Methods', 'PUT, POST, DELETE');
         return res.status(200).json({});
     }
-    console.log("Query=",req.query,";\nBody: ",req.body);
+    
     // make sure we go to the next routes
     next();
 });
@@ -39,15 +39,12 @@ router.route('/check')
 		var invocationParameters = req.body.invocationParameters;
 		var expectedResultData = req.body.expectedResultData;
 		var expectedResultStatus = req.body.expectedResultStatus;
-		console.log(url);
-		console.log(invocationParameters);
-		console.log(expectedResultData);
-		console.log(expectedResultStatus);
-		var output = check(url,invocationParameters,expectedResultData,expectedResultStatus);
-		console.log(output);
-		res.end("ok!");
+		res.send(check(url,invocationParameters,expectedResultData,expectedResultStatus));
+        res.end();
 	});
-
+router.route('/count').get(function (req, res) {
+    res.json({count: 3})
+});
 // register our router on /
 app.use('/', router);
 
@@ -72,7 +69,6 @@ var check = function (url,invocationParameters,expectedResultData,expectedResult
 		}
 	}
 	query = query.substring(0, query.length - 1)
-	console.log(query);
 	var risposta = [];
 	return fetch(query)
 		.then(function(res) {
@@ -83,7 +79,7 @@ var check = function (url,invocationParameters,expectedResultData,expectedResult
 			risposta['resultStatus'] = res.status;
 			risposta['statusTestPassed'] = statusCheck;
 			risposta['resultDataAsExpected'] = resultsCheck;
-			console.log(risposta.json());
-			return risposta.json();
+			return JSON.stringify(risposta);
 		});
+	 
 }
